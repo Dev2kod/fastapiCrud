@@ -111,9 +111,8 @@ from app.api.bypassSsl import bypassSsl
 # Bypass SSL verification
 
 HF_API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct"
-HF_API_TOKEN = "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"
 
-headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
+headers = {"Authorization": f"Bearer {}"}
 
 class PromptRequest(BaseModel):
     prompt: str
