@@ -1,6 +1,10 @@
 import re
 from difflib import get_close_matches
 
+#violation type returned as helmet, jacket
+# time returned as today, yesterday, last_7_days, last_3_months, last_1_year, 3_days_ago, 2_months_ago, 1_year_ago, last_30_minutes, last_2_hours, 15_minutes_ago, 1_hour_ago
+
+
 
 def parseQuery(query:str):
     # Converts user query into structured format
@@ -49,9 +53,9 @@ def parseQuery(query:str):
     #severity catching
     #------------------
     severityMatching={
-        "highest":"high","mid":"medium","lowest":"low",
-        "higher":"high","mid level":"medium","lower":"low",
-        "high":"high","medium":"medium","low":"low"
+        "highest":"High","mid":"Medium","lowest":"Low",
+        "higher":"High","mid level":"Medium","lower":"Low",
+        "high":"High","medium":"Medium","low":"Low"
     }
     
     for word, severity in severityMatching.items():
@@ -67,9 +71,9 @@ def parseQuery(query:str):
     # -----------------------------
 
     if "active" in queryLower:
-        parsed["status"] = "active"
+        parsed["status"] = "Active"
     elif "closed" in queryLower:
-        parsed["status"] = "closed"
+        parsed["status"] = "Closed"
         
     #------------------ 
     #violation type
@@ -94,7 +98,16 @@ def parseQuery(query:str):
             # -----------------------------
     # 🧠 7. TIME (today, yesterday)
     # -----------------------------
+    # -----------------------------
+    # 10. TIME (recent / latest)
+    # -----------------------------
 
+    if "recent" in queryLower or "latest" in queryLower:
+        parsed["time"] = "recent"
+        parsed["sort"] = "desc"
+
+    if "oldest" in queryLower:
+        parsed["sort"] = "asc"
     if "today" in queryLower:
         parsed["time"] = "today"
 
@@ -148,19 +161,38 @@ def parseQuery(query:str):
     days_ago_match = re.search(r'(\d+)\s*day[s]?\s*(ago|before)', queryLower)
     if days_ago_match:
         parsed["time"] = f"{days_ago_match.group(1)}_days_ago"
+        
+    # -----------------------------
+    # 9. TIME (X months ago / before)
+    # -----------------------------
+
+    months_ago_match = re.search(r'(\d+)\s*month[s]?\s*(ago|before)', queryLower)
+    if months_ago_match:
+        parsed["time"] = f"{months_ago_match.group(1)}_months_ago"
 
     # -----------------------------
-    # 10. TIME (recent / latest)
+    # 9. TIME (X years ago / before)
     # -----------------------------
 
-    if "recent" in queryLower or "latest" in queryLower:
-        parsed["time"] = "recent"
-        parsed["sort"] = "desc"
+    years_ago_match = re.search(r'(\d+)\s*(year|yr)[s]?\s*(ago|before)', queryLower)
+    if years_ago_match:
+        parsed["time"] = f"{years_ago_match.group(1)}_years_ago"
 
-    if "oldest" in queryLower:
-        parsed["sort"] = "asc"
+    # -----------------------------
+    # 9. TIME (X minutes ago / before)
+    # -----------------------------
 
+    mins_ago_match = re.search(r'(\d+)\s*(min|minute)[s]?\s*(ago|before)', queryLower)
+    if mins_ago_match:
+        parsed["time"] = f"{mins_ago_match.group(1)}_minutes_ago"
 
+    # -----------------------------
+    # 9. TIME (X hours ago / before)
+    # -----------------------------
+
+    hrs_ago_match = re.search(r'(\d+)\s*(hr|hour)[s]?\s*(ago|before)', queryLower)
+    if hrs_ago_match:
+        parsed["time"] = f"{hrs_ago_match.group(1)}_hours_ago"
     return parsed
 
 
