@@ -101,25 +101,3 @@ async def test_time_async(request: SearchRequest):
     }
 
 
-#---------------------------------------------------API LLM---------------------------------------------------------------
-
-
-from pydantic import BaseModel
-import requests
-from app.api.bypassSsl import bypassSsl
-
-# Bypass SSL verification
-
-HF_API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct"
-
-headers = {"Authorization": f"Bearer {}"}
-
-class PromptRequest(BaseModel):
-    prompt: str
-
-@router.post("/generate")
-async def generate_text(request: PromptRequest):
-    bypassSsl()
-    payload = {"inputs": request.prompt}
-    response = requests.post(HF_API_URL, headers=headers, json=payload)
-    return response.json()
